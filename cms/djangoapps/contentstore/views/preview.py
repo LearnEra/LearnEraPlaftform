@@ -11,6 +11,7 @@ from edxmako.shortcuts import render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment, request_token
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
+from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -139,6 +140,12 @@ def _preview_module_system(request, descriptor):
 
     descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
 
+    def get_python_lib_zip():
+        """Return the bytes of the python_lib.zip file, if any."""
+        asset_key = course_id.make_asset_key("asset", "python_lib.zip")
+        zip_lib = contentstore().find(asset_key, throw_on_not_found=False).data
+        return zip_lib
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -150,6 +157,7 @@ def _preview_module_system(request, descriptor):
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        get_python_lib_zip=get_python_lib_zip,
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
         anonymous_student_id='student',
