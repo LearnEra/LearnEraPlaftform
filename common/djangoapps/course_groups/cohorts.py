@@ -24,6 +24,31 @@ log = logging.getLogger(__name__)
 DEFAULT_COHORT_NAME = "Default Cohort Group"
 
 
+class CohortAssignmentType(object):
+    """
+    The various types of rule-based cohorts
+    """
+    # No automatic rules are applied to this cohort; users must be manually added.
+    NONE = "none"
+
+    # One of (possibly) multiple cohort groups to which users are randomly assigned.
+    # Note: The 'default cohort' group is included in this category if it exists and
+    # there are no other random groups.
+    RANDOM = "random"
+
+    @staticmethod
+    def get(cohort, course):
+        """
+        Returns the assignment type of the given cohort for the given course
+        """
+        if cohort.name in course.auto_cohort_groups:
+            return CohortAssignmentType.RANDOM
+        if len(course.auto_cohort_groups) == 0 and cohort.name == DEFAULT_COHORT_NAME:
+            return CohortAssignmentType.RANDOM
+        else:
+            return CohortAssignmentType.NONE
+
+
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
 # if and when that's fixed, it's a good idea to have a local generator to avoid any other
 # code that messes with the global random module.

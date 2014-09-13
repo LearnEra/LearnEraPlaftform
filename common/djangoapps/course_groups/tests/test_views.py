@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_groups.views import list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
-from course_groups.cohorts import get_cohort
+from course_groups.cohorts import get_cohort, CohortAssignmentType
 
 class CohortFactory(DjangoModelFactory):
     FACTORY_FOR = CourseUserGroup
@@ -114,18 +114,25 @@ class ListCohortsTestCase(CohortViewsTestCase):
         self.assertItemsEqual(
             response_dict.get("cohorts"),
             [
-                {"name": cohort.name, "id": cohort.id, "user_count": cohort.user_count}
+                {
+                    "name": cohort.name,
+                     "id": cohort.id,
+                     "user_count": cohort.user_count,
+                     "assignment_type": cohort.assignment_type
+                }
                 for cohort in expected_cohorts
             ]
         )
 
     @staticmethod
-    def create_expected_cohort(cohort, user_count):
+    def create_expected_cohort(cohort, user_count, assignment_type):
         """
         Create a tuple storing the expected cohort information.
         """
-        cohort_tuple = namedtuple("Cohort", "name id user_count")
-        return cohort_tuple(name=cohort.name, id=cohort.id, user_count=user_count)
+        cohort_tuple = namedtuple("Cohort", "name id user_count assignment_type")
+        return cohort_tuple(
+            name=cohort.name, id=cohort.id, user_count=user_count, assignment_type=assignment_type
+        )
 
     def test_non_staff(self):
         """
@@ -145,9 +152,9 @@ class ListCohortsTestCase(CohortViewsTestCase):
         """
         self._create_cohorts()
         expected_cohorts = [
-            ListCohortsTestCase.create_expected_cohort(self.cohort1, 3),
-            ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
-            ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
+            ListCohortsTestCase.create_expected_cohort(self.cohort1, 3, CohortAssignmentType.NONE),
+            ListCohortsTestCase.create_expected_cohort(self.cohort2, 2, CohortAssignmentType.NONE),
+            ListCohortsTestCase.create_expected_cohort(self.cohort3, 2, CohortAssignmentType.NONE),
         ]
         self.verify_lists_expected_cohorts(expected_cohorts)
 
@@ -166,11 +173,11 @@ class ListCohortsTestCase(CohortViewsTestCase):
         auto_cohort_1 = get_cohort_in_course("AutoGroup1", self.course)
         auto_cohort_2 = get_cohort_in_course("AutoGroup2", self.course)
         expected_cohorts = [
-            ListCohortsTestCase.create_expected_cohort(self.cohort1, 3),
-            ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
-            ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
-            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0),
-            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0),
+            ListCohortsTestCase.create_expected_cohort(self.cohort1, 3, CohortAssignmentType.NONE),
+            ListCohortsTestCase.create_expected_cohort(self.cohort2, 2, CohortAssignmentType.NONE),
+            ListCohortsTestCase.create_expected_cohort(self.cohort3, 2, CohortAssignmentType.NONE),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0, CohortAssignmentType.RANDOM),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0, CohortAssignmentType.RANDOM),
         ]
         self.verify_lists_expected_cohorts(expected_cohorts, actual_cohorts)
 
@@ -188,21 +195,32 @@ class ListCohortsTestCase(CohortViewsTestCase):
         self.verify_lists_expected_cohorts([])
 
         # create enrolled users
-        unassigned_users = [UserFactory.create() for _ in range(3)]
-        self._enroll_users(unassigned_users, self.course.id)
+        users = [UserFactory.create() for _ in range(3)]
+        self._enroll_users(users, self.course.id)
 
         # mimic users accessing the discussion forum
-        for user in unassigned_users:
+        for user in users:
             get_cohort(user, self.course.id)
 
         # verify the default cohort is automatically created
-        actual_cohorts = self.request_list_cohorts(self.course)
         default_cohort = get_default_cohort(self.course)
+        actual_cohorts = self.request_list_cohorts(self.course)
         self.verify_lists_expected_cohorts(
-            [ListCohortsTestCase.create_expected_cohort(default_cohort, len(unassigned_users))],
+            [ListCohortsTestCase.create_expected_cohort(default_cohort, len(users), CohortAssignmentType.RANDOM)],
             actual_cohorts,
         )
 
+        # set auto_cohort_groups and verify the default cohort is no longer listed as RANDOM
+        config_course_cohorts(self.course, [], cohorted=True, auto_cohort_groups=["AutoGroup"])
+        actual_cohorts = self.request_list_cohorts(self.course)
+        auto_cohort = get_cohort_in_course("AutoGroup", self.course)
+        self.verify_lists_expected_cohorts(
+            [
+                ListCohortsTestCase.create_expected_cohort(default_cohort, len(users), CohortAssignmentType.NONE),
+                ListCohortsTestCase.create_expected_cohort(auto_cohort, 0, CohortAssignmentType.RANDOM),
+            ],
+            actual_cohorts,
+        )
 
 class AddCohortTestCase(CohortViewsTestCase):
     """
