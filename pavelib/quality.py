@@ -4,6 +4,7 @@ Check code quality using pep8, pylint, and diff_quality.
 from paver.easy import sh, task, cmdopts, needs
 import os
 import errno
+import re
 from optparse import make_option
 
 from .utils.envs import Env
@@ -11,12 +12,22 @@ from .utils.envs import Env
 PEP8_VIOLATIONS_LIMIT=800
 PYLINT_VIOLATIONS_LIMIT=4800
 
-def _count_violations(file):
-    num_lines = sum(1 for line in open(file))
+def _count_pep8_violations(report_file):
+    num_lines = sum(1 for line in open(report_file))
     return num_lines
 
+def _count_pylint_violations(report_file):
+    num_violations_report = 0
+    pylint_pattern = ".(\d+):\ \[(\D)(\d+.+\])."
+
+    for line in open(report_file):
+        violation_list_for_line = re.split(pylint_pattern, line)
+        if len(violation_list_for_line) == 5:
+            num_violations_report += 1
+    return num_violations_report
+
 @task
-#@needs('pavelib.prereqs.install_python_prereqs')
+@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("errors", "e", "Check for errors only"),
@@ -64,12 +75,13 @@ def run_pylint(options):
             )
         )
 
-        num_violations = num_violations + _count_violations(
+        num_violations += _count_pylint_violations(
             "{report_dir}/pylint.report".format(report_dir=report_dir))
 
-    print(num_violations, " is how many")
-    if ((num_violations > PYLINT_VIOLATIONS_LIMIT) and (not ignore_violations)):
-        raise Exception("Failed. Too many pylint violations.")
+    print("number of violations: " + str(num_violations))
+    if (num_violations > PYLINT_VIOLATIONS_LIMIT) and (not ignore_violations):
+        raise Exception("Failed. Too many pylint violations. "
+                        "{0} violations found".format(num_violations))
 
 
 @task
@@ -92,12 +104,13 @@ def run_pep8(options):
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
         sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
-        num_violations = num_violations + _count_violations(
+        num_violations = num_violations + _count_pep8_violations(
             "{report_dir}/pep8.report".format(report_dir=report_dir))
 
     # Fail the task if the violations limit has been reached
     if ((num_violations > PEP8_VIOLATIONS_LIMIT) and (not ignore_violations)):
-        raise Exception("Failed. Too many pep8 violations.")
+        raise Exception("Failed. Too many pep8 violations. "
+                        "{0} violations found".format(num_violations))
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
