@@ -43,26 +43,26 @@ describe "NewPostView", ->
 
       it "completely show parent category and sub-category", ->
         complete_text = @parent_category_text + " / " + @selected_option_text
-        selected_text_width = @view.getNameWidth(complete_text)
-        @view.maxNameWidth = selected_text_width + 1
+        selected_text_width = @view.topicEdit.getNameWidth(complete_text)
+        @view.topicEdit.maxNameWidth = selected_text_width + 1
         @view.$el.find( "a.topic-title" ).first().click()
         dropdown_text = @view.$el.find(".js-selected-topic").text()
         expect(complete_text).toEqual(dropdown_text)
 
       it "completely show just sub-category", ->
         complete_text = @parent_category_text + " / " + @selected_option_text
-        selected_text_width = @view.getNameWidth(complete_text)
-        @view.maxNameWidth = selected_text_width - 10
+        selected_text_width = @view.topicEdit.getNameWidth(complete_text)
+        @view.topicEdit.maxNameWidth = selected_text_width - 10
         @view.$el.find( "a.topic-title" ).first().click()
         dropdown_text = @view.$el.find(".js-selected-topic").text()
         expect(dropdown_text.indexOf("…")).toEqual(0)
         expect(dropdown_text).toContain(@selected_option_text)
 
       it "partially show sub-category", ->
-        parent_width = @view.getNameWidth(@parent_category_text)
+        parent_width = @view.topicEdit.getNameWidth(@parent_category_text)
         complete_text = @parent_category_text + " / " + @selected_option_text
-        selected_text_width = @view.getNameWidth(complete_text)
-        @view.maxNameWidth = selected_text_width - parent_width
+        selected_text_width = @view.topicEdit.getNameWidth(complete_text)
+        @view.topicEdit.maxNameWidth = selected_text_width - parent_width
         @view.$el.find( "a.topic-title" ).first().click()
         dropdown_text = @view.$el.find(".js-selected-topic").text()
         expect(dropdown_text.indexOf("…")).toEqual(0)
@@ -70,8 +70,8 @@ describe "NewPostView", ->
 
       it "broken span doesn't occur", ->
         complete_text = @parent_category_text + " / " + @selected_option_text
-        selected_text_width = @view.getNameWidth(complete_text)
-        @view.maxNameWidth = @view.getNameWidth(@selected_option_text) + 100
+        selected_text_width = @view.topicEdit.getNameWidth(complete_text)
+        @view.topicEdit.maxNameWidth = @view.topicEdit.getNameWidth(@selected_option_text) + 100
         @view.$el.find( "a.topic-title" ).first().click()
         dropdown_text = @view.$el.find(".js-selected-topic").text()
         expect(dropdown_text.indexOf("/ span>")).toEqual(-1)
