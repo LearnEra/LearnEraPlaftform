@@ -25,8 +25,8 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     def setUp(self):
-
-        self.test_course = CourseFactory.create(display_name='Robot_Sub_Course')
+        super(TestNavigation, self).setUp()
+        self.test_course = CourseFactory.create(course='sub', display_name='Robot_Sub_Course')
         self.course = CourseFactory.create(display_name='Robot_Super_Course')
         self.chapter0 = ItemFactory.create(parent=self.course,
                                            display_name='Overview')
@@ -57,7 +57,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                                     chrome='accordion,tabs')
         self.tabtest = ItemFactory.create(parent=self.chapterchrome,
                                           display_name='progress_tab',
-                                          default_tab = 'progress')
+                                          default_tab='progress')
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):

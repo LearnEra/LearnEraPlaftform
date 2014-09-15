@@ -690,9 +690,8 @@ def change_enrollment(request, auto_register=False):
     if action == "enroll":
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
-        try:
-            course = modulestore().get_course(course_id)
-        except ItemNotFoundError:
+        course = modulestore().get_course(course_id)
+        if course is None:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))

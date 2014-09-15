@@ -18,6 +18,7 @@ from student.models import Registration
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from contentstore.utils import reverse_url
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from uuid import uuid4
 
 
 def parse_json(response):
@@ -79,7 +80,7 @@ class CourseTestCase(ModuleStoreTestCase):
 
         self.course = CourseFactory.create(
             org='MITx',
-            number='999',
+            number=uuid4().hex[:9],
             display_name='Robot Super Course',
         )
 
