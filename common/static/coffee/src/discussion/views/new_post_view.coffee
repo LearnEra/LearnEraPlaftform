@@ -17,14 +17,14 @@ if Backbone?
           })
           @$el.html(_.template($("#new-post-template").html(), context))
 
-          @topicEdit = new DiscussionTopicView {
+          @topic = new DiscussionTopicView {
               topicId:  @topicId
               course_settings: @course_settings
               mode: @mode
               is_cohorted: context.cohort_options
           }
 
-          @addField(@topicEdit.render())
+          @addField(@topic.render())
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "js-post-body"
 
       addField: (fieldView) ->
@@ -55,7 +55,7 @@ if Backbone?
           thread_type = @$(".post-type-input:checked").val()
           title   = @$(".js-post-title").val()
           body    = @$(".js-post-body").find(".wmd-input").val()
-          group = @$(".js-group-select option:selected").attr("value")
+          group = @topic.getSelectedTopic()
 
           anonymous          = false || @$(".js-anon").is(":checked")
           anonymous_to_peers = false || @$(".js-anon-peers").is(":checked")

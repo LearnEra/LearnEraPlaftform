@@ -29,6 +29,7 @@ if Backbone?
               @$el.html(_.template($("#topic-template").html(), context))
               @dropdownButton = @$(".post-topic-button")
               @topicMenu      = @$(".topic-menu-wrapper")
+              @selectedTopic  = @$(".js-selected-topic")
               @hideTopicDropdown()
               @setTopic(@$("a.topic-title").first())
           return @$el
@@ -95,7 +96,10 @@ if Backbone?
               @hideTopicDropdown()
 
       setSelectedTopic: ->
-          @$(".js-selected-topic").html(@fitName(@topicText))
+          @selectedTopic.html(@fitName(@topicText))
+
+      getSelectedTopic: ->
+          return @selectedTopic.html()
 
       getFullTopicName: (topicElement) ->
           name = topicElement.html()
