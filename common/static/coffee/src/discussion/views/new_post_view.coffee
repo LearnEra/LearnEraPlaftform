@@ -19,6 +19,12 @@ if Backbone?
           context.topics_html = @renderCategoryMap(@course_settings.get("category_map")) if @mode is "tab"
           @$el.html(_.template($("#new-post-template").html(), context))
 
+          @thread_type = new DiscussionThreadTypeView {
+              form_id: context.form_id
+          }
+
+          @addField(@thread_type.render())
+
           if @mode is "tab"
               # set up the topic dropdown in tab mode
               @dropdownButton = @$(".post-topic-button")
@@ -27,6 +33,9 @@ if Backbone?
               @setTopic(@$("a.topic-title").first())
 
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "js-post-body"
+
+      addField: (fieldView) ->
+          @$('.forum-new-post-panel').append fieldView
 
       renderCategoryMap: (map) ->
           category_template = _.template($("#new-post-menu-category-template").html())
@@ -74,7 +83,7 @@ if Backbone?
 
       createPost: (event) ->
           event.preventDefault()
-          thread_type = @$(".post-type-input:checked").val()
+          thread_type = @thread_type.val()
           title   = @$(".js-post-title").val()
           body    = @$(".js-post-body").find(".wmd-input").val()
           group = @$(".js-group-select option:selected").attr("value")
