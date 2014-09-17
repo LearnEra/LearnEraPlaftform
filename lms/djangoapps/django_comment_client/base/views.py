@@ -18,8 +18,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.models import CourseUserGroup
-from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -141,10 +139,12 @@ def update_thread(request, course_id, thread_id):
         return JsonError(_("Title can't be empty"))
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
+
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
+    thread.commentable_id = request.POST["commentable_id"]
     thread.save()
     if request.is_ajax():
         return ajax_content_response(request, course_key, thread.to_dict())
@@ -608,6 +608,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         }
     })
 
+
 @require_GET
 @login_required
 def users(request, course_id):
@@ -634,7 +635,7 @@ def users(request, course_id):
     try:
         matched_user = User.objects.get(username=username)
         cc_user = cc.User.from_django_user(matched_user)
-        cc_user.course_id=course_key
+        cc_user.course_id = course_key
         cc_user.retrieve(complete=False)
         if (cc_user['threads_count'] + cc_user['comments_count']) > 0:
             user_objs.append({

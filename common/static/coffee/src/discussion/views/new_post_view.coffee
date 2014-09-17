@@ -6,24 +6,20 @@ if Backbone?
           if @mode not in ["tab", "inline"]
               throw new Error("invalid mode: " + @mode)
           @course_settings = options.course_settings
-          @topicId = options.topicId
+          @topic = new DiscussionTopicView {
+              topicId:  options.topicId
+              course_settings: @course_settings
+              mode: @mode
+          }
 
       render: () ->
           context = _.clone(@course_settings.attributes)
           _.extend(context, {
               cohort_options: @getCohortOptions(),
               mode: @mode,
-              form_id: @mode + (if @topicId then "-" + @topicId else "")
+              form_id: @mode + (if @topic.getTopicId() then "-" + @topic.getTopicId() else "")
           })
           @$el.html(_.template($("#new-post-template").html(), context))
-
-          @topic = new DiscussionTopicView {
-              topicId:  @topicId
-              course_settings: @course_settings
-              mode: @mode
-              is_cohorted: context.cohort_options
-          }
-
           @addField(@topic.render())
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "js-post-body"
 
@@ -55,13 +51,13 @@ if Backbone?
           thread_type = @$(".post-type-input:checked").val()
           title   = @$(".js-post-title").val()
           body    = @$(".js-post-body").find(".wmd-input").val()
-          group = @topic.getSelectedTopic()
+          group   = @$(".js-group-select option:selected").attr("value")
 
           anonymous          = false || @$(".js-anon").is(":checked")
           anonymous_to_peers = false || @$(".js-anon-peers").is(":checked")
           follow             = false || @$(".js-follow").is(":checked")
 
-          url = DiscussionUtil.urlFor('create_thread', @topicId)
+          url = DiscussionUtil.urlFor('create_thread', @topic.getTopicId())
 
           DiscussionUtil.safeAjax
               $elem: $(event.target)

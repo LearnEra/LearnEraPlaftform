@@ -31,7 +31,11 @@ if Backbone?
               @topicMenu      = @$(".topic-menu-wrapper")
               @selectedTopic  = @$(".js-selected-topic")
               @hideTopicDropdown()
-              @setTopic(@$("a.topic-title").first())
+              links = @$("a.topic-title")
+              if @getTopicId()
+                @setTopic(links.filter('[data-discussion-id=' + @getTopicId() + ']'))
+              else
+                @setTopic(links.first())
           return @$el
 
       renderCategoryMap: (map) ->
@@ -74,7 +78,6 @@ if Backbone?
           @menuOpen = false
           @dropdownButton.removeClass('dropped')
           @topicMenu.hide()
-
           $("body").unbind "click", @hideTopicDropdown
 
       handleTopicEvent: (event) ->
@@ -84,28 +87,31 @@ if Backbone?
 
       setTopic: ($target) ->
           if $target.data('discussion-id')
-              @topicText = $target.html()
               @topicText  = @getFullTopicName($target)
-              @topicId   = $target.data('discussion-id')
-              @setSelectedTopic()
+              @topicId    = $target.data('discussion-id')
+              @setSelectedTopicName(@topicText)
               if $target.data("cohorted")
                 $(".js-group-select").prop("disabled", false)
               else
-                $(".js-group-select").val("")
-                $(".js-group-select").prop("disabled", true)
+                $(".js-group-select").val("").prop("disabled", true)
               @hideTopicDropdown()
 
-      setSelectedTopic: ->
-          @selectedTopic.html(@fitName(@topicText))
+      getTopicId: ->
+        return @topicId
 
-      getSelectedTopic: ->
-          return @selectedTopic.html()
+      setSelectedTopicName: (text) ->
+          @selectedTopic.html(@fitName(text))
 
+      # Return full name for the `topicElement` if it is passed.
+      # Otherwise, full name for the last set topic will be returned.
       getFullTopicName: (topicElement) ->
-          name = topicElement.html()
-          topicElement.parents('.topic-submenu').each ->
-              name = $(this).siblings('.topic-title').text() + ' / ' + name
-          return name
+          if topicElement
+            name = topicElement.html()
+            topicElement.parents('.topic-submenu').each ->
+                name = $(this).siblings('.topic-title').text() + ' / ' + name
+            return name
+          else
+            return @topicText
 
       getNameWidth: (name) ->
           test = $("<div>")

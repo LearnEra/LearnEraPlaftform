@@ -254,46 +254,23 @@ if Backbone?
       @renderEditView()
 
     update: (event) =>
-
-      newTitle = @editView.$(".edit-post-title").val()
-      newBody  = @editView.$(".edit-post-body textarea").val()
-
-      url = DiscussionUtil.urlFor('update_thread', @model.id)
-
-      DiscussionUtil.safeAjax
-          $elem: $(event.target)
-          $loading: $(event.target) if event
-          url: url
-          type: "POST"
-          dataType: 'json'
-          async: false # TODO when the rest of the stuff below is made to work properly..
-          data:
-              title: newTitle
-              body: newBody
-
-          error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
-          success: (response, textStatus) =>
-              # TODO: Move this out of the callback, this makes it feel sluggish
-              @editView.$(".edit-post-title").val("").attr("prev-text", "")
-              @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
-              @editView.$(".wmd-preview p").html("")
-
-              @model.set
-                title: newTitle
-                body: newBody
-              @model.unset("abbreviatedBody")
-
-              @createShowView()
-              @renderShowView()
+      @editView.save(event).done((() ->
+        @createShowView()
+        @renderShowView()
+      ).bind(@))
 
     createEditView: () ->
-
       if @showView?
         @showView.undelegateEvents()
         @showView.$el.empty()
         @showView = null
 
-      @editView = new DiscussionThreadEditView(model: @model)
+      @editView = new DiscussionThreadEditView(
+        model: @model
+        mode: @mode
+        course_settings: @options.course_settings
+        topicId: @model.get('commentable_id')
+      )
       @editView.bind "thread:update", @update
       @editView.bind "thread:cancel_edit", @cancelEdit
 
