@@ -1,9 +1,9 @@
 ###################################
-September 18, 2014
+September 17, 2014
 ###################################
 
 The following information reflects what is new in the edX Platform as of
-September 18, 2014. See previous pages in this document for a history of changes.
+September 17, 2014. See previous pages in this document for a history of changes.
 
 ****************************************
 edX Release Announcements Mailing List
@@ -20,9 +20,9 @@ an email message when we update the edX Course Staff Release Notes.
 edX Learning Management System
 *******************************
 
-* On the **Discussions** tab, you sometimes received an error message when you clicked through the thread list quickly. This bug has been fixed. 
+* On the **Discussions** tab, an error message sometimes appeared when you clicked through the thread list quickly. This bug has been fixed. 
 
-* In some circumstances, if a student visited a section in the courseware and then left the edX session, and that section later became unavailable, the student saw a "Page Not Found" error message when she returned to her edX session. This bug has been fixed. (LMS-6492) 
+* In some circumstances, if a student visited a section in the courseware and then left the edX session by closing the browser window, and that section later became unavailable, the student saw a "Page Not Found" error message when she returned to the course. This bug has been fixed. (LMS-6492) 
 
 * If a student changed the playback speed of a video in Firefox, the video did not play. This bug has been fixed. (BLD-1221)
 
@@ -41,7 +41,11 @@ Coming Soon
 
 We're pleased to announce the following upcoming change:
 
-* Anything we can announce here?
+* Course teams will soon be able to access data about their courses on a
+  dedicated dashboard for course-specific data. By providing insights into who
+  your students are, and what they do while interacting with your course, the
+  data available on this dashboard can validate choices you’ve made, reveal
+  unexpected patterns, and inform plans for changes to the course.
 
 
 **************************
