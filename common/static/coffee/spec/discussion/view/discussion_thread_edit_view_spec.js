@@ -22,7 +22,7 @@
 
             this.createEditView = function (options) {
               options = _.extend({
-                    el: $('#fixture-element'),
+                    container: $('#fixture-element'),
                     model: this.thread,
                     mode: 'tab',
                     topicId: 'dummy_id',

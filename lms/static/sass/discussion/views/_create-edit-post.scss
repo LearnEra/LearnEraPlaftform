@@ -174,7 +174,8 @@
 // ====================
 
 // UI: errors - new post creation
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   .post-errors {
     margin-bottom: $baseline;
     border-radius: 3px;

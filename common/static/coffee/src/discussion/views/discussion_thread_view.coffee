@@ -260,6 +260,7 @@ if Backbone?
         @showView = null
 
       @editView = new DiscussionThreadEditView(
+        container: @$('.thread-content-wrapper')
         model: @model
         mode: @mode
         course_settings: @options.course_settings
@@ -273,7 +274,7 @@ if Backbone?
       view.delegateEvents()
 
     renderEditView: () ->
-      @renderSubView(@editView)
+      @editView.render()
 
     createShowView: () ->
       @showView = new DiscussionThreadShowView({model: @model, mode: @mode})
