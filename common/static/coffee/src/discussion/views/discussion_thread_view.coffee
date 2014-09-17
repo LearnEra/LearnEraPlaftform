@@ -253,12 +253,6 @@ if Backbone?
       @createEditView()
       @renderEditView()
 
-    update: (event) =>
-      @editView.save().done((() ->
-        @createShowView()
-        @renderShowView()
-      ).bind(@))
-
     createEditView: () ->
       if @showView?
         @showView.undelegateEvents()
@@ -271,8 +265,7 @@ if Backbone?
         course_settings: @options.course_settings
         topicId: @model.get('commentable_id')
       )
-      @editView.bind "thread:update", @update
-      @editView.bind "thread:cancel_edit", @cancelEdit
+      @editView.bind "thread:updated thread:cancel_edit", @closeEditView
 
     renderSubView: (view) ->
       view.setElement(@$('.thread-content-wrapper'))
@@ -283,12 +276,6 @@ if Backbone?
       @renderSubView(@editView)
 
     createShowView: () ->
-
-      if @editView?
-        @editView.undelegateEvents()
-        @editView.$el.empty()
-        @editView = null
-
       @showView = new DiscussionThreadShowView({model: @model, mode: @mode})
       @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
@@ -296,7 +283,7 @@ if Backbone?
     renderShowView: () ->
       @renderSubView(@showView)
 
-    cancelEdit: (event) =>
+    closeEditView: (event) =>
       @createShowView()
       @renderShowView()
 

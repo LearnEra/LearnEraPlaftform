@@ -64,6 +64,7 @@
                             courseware_title: this.topic.getFullTopicName()
                         });
                         this.model.unset('abbreviatedBody');
+                        this.trigger('thread:updated');
                     }.bind(this)
                 });
             },
@@ -71,12 +72,14 @@
             updateHandler: function(event) {
                 event.preventDefault();
                 this.trigger('thread:update', event);
+                this.save();
                 return this;
             },
 
             cancelHandler: function(event) {
                 event.preventDefault();
                 this.trigger("thread:cancel_edit", event);
+                this.remove();
                 return this;
             }
         });

@@ -68,9 +68,10 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
+  <form class="discussion-post edit-post-form">
     <h1>Editing post</h1>
     <ul class="edit-post-form-errors"></ul>
+    <div class="forum-edit-post-panel"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">Edit post title</label>
       <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="<%-title %>" placeholder="Title">
@@ -80,7 +81,7 @@ browser and pasting the output.  When that file changes, this one should be rege
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="Update post">
     <a href="#" class="post-cancel">Cancel</a>
-  </div>
+  </form>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
