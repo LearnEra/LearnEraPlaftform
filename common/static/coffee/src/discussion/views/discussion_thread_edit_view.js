@@ -47,9 +47,9 @@
                     dataType: 'json',
                     async: false, // @TODO when the rest of the stuff below is made to work properly..
                     data: {
-                      title: title,
-                      body: body,
-                      commentable_id: commentableId
+                        title: title,
+                        body: body,
+                        commentable_id: commentableId
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.edit-post-form-errors')),
                     success: function() {

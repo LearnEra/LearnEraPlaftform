@@ -6,13 +6,14 @@ if Backbone?
           if @mode not in ["tab", "inline"]
               throw new Error("invalid mode: " + @mode)
           @course_settings = options.course_settings
+          @topicId = options.topicId
+
+      render: () ->
           @topic = new DiscussionTopicView {
-              topicId:  options.topicId
+              topicId:  @topicId
               course_settings: @course_settings
               mode: @mode
           }
-
-      render: () ->
           context = _.clone(@course_settings.attributes)
           _.extend(context, {
               cohort_options: @getCohortOptions(),
@@ -20,6 +21,7 @@ if Backbone?
               form_id: @mode + (if @topic.getTopicId() then "-" + @topic.getTopicId() else "")
           })
           @$el.html(_.template($("#new-post-template").html(), context))
+          @on('thread:topic_change', @updateGroupDropdown)
           @addField(@topic.render())
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "js-post-body"
 
@@ -37,6 +39,12 @@ if Backbone?
       events:
           "submit .forum-new-post-form": "createPost"
           "change .post-option-input": "postOptionChange"
+
+      updateGroupDropdown: ($target) ->
+        if $target.data('cohorted')
+            $('.js-group-select').prop('disabled', false);
+        else
+            $('.js-group-select').val('').prop('disabled', true);
 
       postOptionChange: (event) ->
           $target = $(event.target)
