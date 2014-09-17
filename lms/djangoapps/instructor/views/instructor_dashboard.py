@@ -21,12 +21,11 @@ from django.conf import settings
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link
+from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -51,7 +50,6 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml)
 
     access = {
         'admin': request.user.is_staff,
@@ -95,10 +93,6 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price:
         sections.append(_section_e_commerce(course_key, access))
 
-    studio_url = None
-    if is_studio_course:
-        studio_url = get_cms_course_link(course)
-
     enrollment_count = sections[0]['enrollment_count']['total']
     disable_buttons = False
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
@@ -117,7 +111,8 @@ def instructor_dashboard_2(request, course_id):
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'studio_url': studio_url,
+        'studio_url': get_studio_url(course, 'course'),
+        'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message

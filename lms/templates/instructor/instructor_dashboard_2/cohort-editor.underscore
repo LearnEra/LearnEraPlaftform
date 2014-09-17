@@ -3,4 +3,18 @@
         <span class="title-value"><%- cohort.get('name') %></span>
         <span class="group-count"><%- cohort.get('user_count') %></span>
     </h3>
+    <div class="cohort-management-group-setup">
+        <h4 class="sr">This cohort group's current management set up:</h4>
+        <div class="setup-value">
+            <% if (cohort.get('assignment_type') == "none") { %>
+                Students are added to this group only when you provide their email addresses or usernames on this page.
+            <% } else { %>
+                Students are added to this group automatically
+            <% } %>
+            <a href="http://edx.readthedocs.org" class="incontext-help action-secondary action-help">What does this mean?</a>
+        </div>
+        <div class="setup-actions">
+            <a href="${advanced_settings_url}" class="action-secondary action-edit">Edit settings in Studio</a>
+        </div>
+    </div>
 </header>
