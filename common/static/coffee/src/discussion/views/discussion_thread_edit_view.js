@@ -3,8 +3,8 @@
     if (Backbone) {
         this.DiscussionThreadEditView = Backbone.View.extend({
             events: {
-                'click .post-update': 'update',
-                'click .post-cancel': 'cancel'
+                'submit .edit-post-form': 'updateHandler',
+                'click .post-cancel': 'cancelHandler'
             },
 
             initialize: function(options) {
@@ -23,6 +23,7 @@
             render: function() {
                 this.template = _.template($('#thread-edit-template').html());
                 this.$el.html(this.template(this.model.toJSON()));
+                this.submitBtn = this.$('.post-update');
                 this.addField(this.topic.render());
                 DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-post-body');
                 return this;
@@ -33,19 +34,14 @@
                 return this;
             },
 
-            update: function(event) {
-                this.trigger('thread:update', event);
-                return this;
-            },
-
-            save: function(event) {
+            save: function() {
                 var title = this.$('.edit-post-title').val(),
                     body = this.$('.edit-post-body textarea').val(),
                     commentableId = this.topic.getTopicId();
 
                 return DiscussionUtil.safeAjax({
-                    $elem: $(event.target),
-                    $loading: event ? $(event.target) : void 0,
+                    $elem: this.submitBtn,
+                    $loading: this.submitBtn,
                     url: DiscussionUtil.urlFor('update_thread', this.model.id),
                     type: 'POST',
                     dataType: 'json',
@@ -72,7 +68,14 @@
                 });
             },
 
-            cancel: function(event) {
+            updateHandler: function(event) {
+                event.preventDefault();
+                this.trigger('thread:update', event);
+                return this;
+            },
+
+            cancelHandler: function(event) {
+                event.preventDefault();
                 this.trigger("thread:cancel_edit", event);
                 return this;
             }

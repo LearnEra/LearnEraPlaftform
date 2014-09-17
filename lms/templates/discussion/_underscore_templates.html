@@ -54,7 +54,7 @@
 % endfor
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
+  <form class="discussion-post edit-post-form">
     <h1>${_("Editing post")}</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="forum-edit-post-panel"></div>
@@ -67,7 +67,7 @@
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
-  </div>
+  </form>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">

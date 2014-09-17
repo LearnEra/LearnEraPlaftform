@@ -254,7 +254,7 @@ if Backbone?
       @renderEditView()
 
     update: (event) =>
-      @editView.save(event).done((() ->
+      @editView.save().done((() ->
         @createShowView()
         @renderShowView()
       ).bind(@))
@@ -297,7 +297,6 @@ if Backbone?
       @renderSubView(@showView)
 
     cancelEdit: (event) =>
-      event.preventDefault()
       @createShowView()
       @renderShowView()
 
