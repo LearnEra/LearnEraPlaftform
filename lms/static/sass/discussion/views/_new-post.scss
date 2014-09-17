@@ -2,7 +2,8 @@
 // ====================
 
 // UI: form structure
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   @include clearfix;
   box-sizing: border-box;
   margin: 0;
@@ -64,7 +65,8 @@
 // ====================
 
 // UI: inputs
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   .post-topic-button {
     @include white-button;
     @extend %cont-truncated;

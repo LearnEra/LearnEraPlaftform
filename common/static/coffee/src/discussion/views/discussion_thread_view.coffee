@@ -293,7 +293,10 @@ if Backbone?
         @showView.$el.empty()
         @showView = null
 
-      @editView = new DiscussionThreadEditView(model: @model)
+      @editView = new DiscussionThreadEditView(
+        model: @model
+        form_id: @mode + (if @topicId then "-" + @topicId else "")
+      )
       @editView.bind "thread:update", @update
       @editView.bind "thread:cancel_edit", @cancelEdit
 

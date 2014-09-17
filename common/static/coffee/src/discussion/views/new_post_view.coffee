@@ -63,7 +63,6 @@ if Backbone?
           "click .topic-menu-wrapper": "handleTopicEvent"
           "click .topic-filter-label": "ignoreClick"
           "keyup .topic-filter-input": DiscussionFilter.filterDrop
-          "change .post-option-input": "postOptionChange"
           "click .cancel": "cancel"
           "reset .forum-new-post-form": "updateStyles"
 
@@ -72,14 +71,6 @@ if Backbone?
       # Without this, clicking the search field would also close the menu.
       ignoreClick: (event) ->
           event.stopPropagation()
-
-      postOptionChange: (event) ->
-          $target = $(event.target)
-          $optionElem = $target.closest(".post-option")
-          if $target.is(":checked")
-              $optionElem.addClass("is-enabled")
-          else
-              $optionElem.removeClass("is-enabled")
 
       createPost: (event) ->
           event.preventDefault()
